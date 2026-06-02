@@ -90,7 +90,7 @@ function renderAanvullend() {
 function renderOverzicht() {
   const chosen = state.form.products.map(p => productOptions[p].label).join(", ") || "Nog niet gekozen";
   const body = `<div class="summary"><b>Controleer je gegevens</b><br>Adres: ${escapeHtml(state.form.postcode)} ${escapeHtml(state.form.huisnummer)}<br>Verzekering: ${chosen}<br>Premie: ${euro(premium())} per maand</div>
-  ${yesNo("slotvraag1", "Is in de afgelopen 5 jaar een verzekering van u of een belanghebbende bij deze verzekering geweigerd, opgezegd of geaccepteerd onder bijzondere voorwaarden?")}
+  ${yesNo("slotvraag1", "Isssss in de afgelopen 5 jaar een verzekering van u of een belanghebbende bij deze verzekering geweigerd, opgezegd of geaccepteerd onder bijzondere voorwaarden?")}
   ${yesNo("slotvraag2", "Bent u of een belanghebbende bij deze verzekering in de afgelopen 8 jaar in aanraking geweest met politie of justitie, of verdacht of veroordeeld voor een strafbaar feit?")}
   ${yesNo("slotvraag3", "Heeft u of een belanghebbende bij deze verzekering in de afgelopen 5 jaar meer dan 2 schades geclaimd op een vergelijkbare verzekering?")}`;
   shell(stepCard("Overzicht en slotvragen", "Stap 4", body, "Naar afronden", "next"), { back: "back" });

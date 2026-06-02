@@ -37,7 +37,7 @@ function shell(inner, { external = false, hideProgress = false, back = null } = 
     <div class="page">
       <div class="wrap">
         <header class="top">
-          <div><p class="eyebrow">Prototype verzekering aanvragen</p><h1 class="title">Woonhuisverzekering</h1></div>
+          <div><p class="eyebrow">Prototype verzekering aanvragen</p><h1 class="title">Woonverzekering</h1></div>
           <div class="pill ${external ? "external" : ""}">${external ? "Externe iDIN omgeving" : "Aanvraagomgeving"}</div>
         </header>
         ${hideProgress ? "" : stepper()}

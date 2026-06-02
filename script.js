@@ -7,7 +7,8 @@ const productOptions = {
 
 const state = {
   step: 0,
-  idinPhase: "intro",
+  // idle = nog niet gestart vanaf "Overzicht"
+  idinPhase: "idle",
   selectedBank: "",
   form: {
     postcode: "3511 AA",
@@ -120,8 +121,11 @@ function render() {
   if (state.step === 0) renderBasis();
   else if (state.step === 1) renderPremie();
   else if (state.step === 2) renderAanvullend();
+  // iDIN schermen moeten bij "Stap 4" (Overzicht) horen.
+  // Daarom starten we iDIN op step=3 en pas na `idin-done` gaan we door naar step=4 ("Stap 5").
+  else if (state.step === 3 && state.idinPhase !== "idle") renderIdin();
   else if (state.step === 3) renderOverzicht();
-  else if (state.step === 4 && state.idinPhase !== "done") renderIdin();
+  else if (state.step === 4 && state.idinPhase !== "done") renderIdin(); // fallback
   else if (state.step === 4) renderAfronden();
   else renderThanks();
 }
@@ -129,15 +133,23 @@ function render() {
 function bindEvents() {
   document.querySelectorAll("[data-action]").forEach(el => el.addEventListener("click", e => {
     const action = e.currentTarget.dataset.action;
-    if (action === "next") setState({ step: state.step + 1 });
-    if (action === "back") setState({ step: Math.max(0, state.step - 1) });
-    if (action === "back-to-overzicht") setState({ step: 3 });
+    if (action === "next") {
+      // Vanaf "Overzicht" (Stap 4) starten we de iDIN melding op hetzelfde stap-punt.
+      if (state.step === 3 && state.idinPhase === "idle") setState({ idinPhase: "intro", selectedBank: "" });
+      else setState({ step: state.step + 1 });
+    }
+    if (action === "back") {
+      // Terug van "Stap 5" naar "Stap 4" moet ook iDIN terugzetten naar niet-gestart.
+      if (state.step === 4) setState({ idinPhase: "idle", selectedBank: "" });
+      setState({ step: Math.max(0, state.step - 1) });
+    }
+    if (action === "back-to-overzicht") setState({ step: 3, idinPhase: "idle", selectedBank: "" });
     if (action === "idin-bank") setState({ idinPhase: "bank" });
     if (action === "idin-app") setState({ idinPhase: "app" });
-    if (action === "idin-done") setState({ idinPhase: "done" });
+    if (action === "idin-done") setState({ idinPhase: "done", step: 4 });
     if (action === "finish") setState({ step: 5 });
     if (action === "restart") {
-      state.step = 0; state.idinPhase = "intro"; state.selectedBank = ""; render();
+      state.step = 0; state.idinPhase = "idle"; state.selectedBank = ""; render();
     }
   }));
   document.querySelectorAll("[data-field]").forEach(el => el.addEventListener("input", e => {

@@ -1,4 +1,4 @@
-# Woonverzekering iDIN prototype
+# Woonhuisverzekering iDIN prototype
 
 Statische GitHub Pages-versie van het woonverzekering/iDIN prototype.
 

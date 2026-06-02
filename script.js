@@ -7,9 +7,9 @@ const productOptions = {
 
 const state = {
   step: 0,
-  // idle = nog niet gestart vanaf "Overzicht"
-  idinPhase: "idle",
+  idinPhase: "intro",
   selectedBank: "",
+  showIdinInfo: false,
   form: {
     postcode: "3511 AA",
     huisnummer: "12",
@@ -72,7 +72,8 @@ function yesNo(key, question) {
 }
 
 function renderBasis() {
-  shell(stepCard("Basisgegevens", "Stap 1", `${field("postcode", "Postcode", "1234 AB")}${field("huisnummer", "Huisnummer", "12")}`));
+  const expectation = `<div class="idin-note"><span class="idin-note-icon">🔒</span><div><p>Voor het afsluiten van je verzekering verifiëren we straks je identiteit via iDIN.</p><button type="button" class="text-link" data-action="toggle-idin-info">Waarom gebruiken wij iDIN?</button><div class="idin-info ${state.showIdinInfo ? "" : "hidden"}"><b>Waarom gebruiken wij iDIN?</b><p>Met iDIN controleren we veilig via je bank dat jij bent wie je zegt dat je bent. Zo hoef je minder gegevens handmatig in te vullen en kunnen we je aanvraag sneller verwerken.</p></div></div></div>`;
+  shell(stepCard("Basisgegevens", "Stap 1", `${field("postcode", "Postcode", "1234 AB")}${field("huisnummer", "Huisnummer", "12")}${expectation}`));
 }
 
 function renderPremie() {
@@ -121,11 +122,8 @@ function render() {
   if (state.step === 0) renderBasis();
   else if (state.step === 1) renderPremie();
   else if (state.step === 2) renderAanvullend();
-  // iDIN schermen moeten bij "Stap 4" (Overzicht) horen.
-  // Daarom starten we iDIN op step=3 en pas na `idin-done` gaan we door naar step=4 ("Stap 5").
-  else if (state.step === 3 && state.idinPhase !== "idle") renderIdin();
   else if (state.step === 3) renderOverzicht();
-  else if (state.step === 4 && state.idinPhase !== "done") renderIdin(); // fallback
+  else if (state.step === 4 && state.idinPhase !== "done") renderIdin();
   else if (state.step === 4) renderAfronden();
   else renderThanks();
 }
@@ -133,23 +131,16 @@ function render() {
 function bindEvents() {
   document.querySelectorAll("[data-action]").forEach(el => el.addEventListener("click", e => {
     const action = e.currentTarget.dataset.action;
-    if (action === "next") {
-      // Vanaf "Overzicht" (Stap 4) starten we de iDIN melding op hetzelfde stap-punt.
-      if (state.step === 3 && state.idinPhase === "idle") setState({ idinPhase: "intro", selectedBank: "" });
-      else setState({ step: state.step + 1 });
-    }
-    if (action === "back") {
-      // Terug van "Stap 5" naar "Stap 4" moet ook iDIN terugzetten naar niet-gestart.
-      if (state.step === 4) setState({ idinPhase: "idle", selectedBank: "" });
-      setState({ step: Math.max(0, state.step - 1) });
-    }
-    if (action === "back-to-overzicht") setState({ step: 3, idinPhase: "idle", selectedBank: "" });
+    if (action === "next") setState({ step: state.step + 1 });
+    if (action === "back") setState({ step: Math.max(0, state.step - 1) });
+    if (action === "back-to-overzicht") setState({ step: 3 });
     if (action === "idin-bank") setState({ idinPhase: "bank" });
     if (action === "idin-app") setState({ idinPhase: "app" });
-    if (action === "idin-done") setState({ idinPhase: "done", step: 4 });
+    if (action === "idin-done") setState({ idinPhase: "done" });
     if (action === "finish") setState({ step: 5 });
+    if (action === "toggle-idin-info") setState({ showIdinInfo: !state.showIdinInfo });
     if (action === "restart") {
-      state.step = 0; state.idinPhase = "idle"; state.selectedBank = ""; render();
+      state.step = 0; state.idinPhase = "intro"; state.selectedBank = ""; render();
     }
   }));
   document.querySelectorAll("[data-field]").forEach(el => el.addEventListener("input", e => {

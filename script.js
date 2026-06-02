@@ -104,12 +104,7 @@ function renderIdin() {
   } else if (state.idinPhase === "bank") {
     html = `<div class="idin-screen"><div class="idin-box"><h2>Kies je bank</h2><p class="muted">Selecteer je bank om door te gaan met identificeren.</p><div class="bank-grid">${banks.map(b => `<button class="bank ${state.selectedBank === b ? "selected" : ""}" data-bank="${b}">${b}</button>`).join("")}</div><button class="btn green" data-action="idin-app" ${state.selectedBank ? "" : "disabled"} style="margin-top:22px">Verder naar bank app</button></div></div>`;
   } else {
-    html = `<div class="idin-screen"><div class="phone"><div class="phone-inner"><div class="phone-top"></div><div class="bank-app-brand">
-  ${state.selectedBank === "Rabobank"
-    ? `<img src="assets/rabobank.jpg" alt="Rabobank">`
-    : ""}
-  <p class="muted"><b>${escapeHtml(state.selectedBank)}</b> app</p>
-</div><h2>Identiteit bevestigen</h2><div class="notice">Naam: Sam de Vries<br>Geboortedatum: 14-05-1988<br>Adres: Voorbeeldstraat 12</div><button class="btn green" data-action="idin-done" style="width:100%;margin-top:18px">Bevestigen in app</button></div></div></div>`;
+    html = `<div class="idin-screen"><div class="phone"><div class="phone-inner"><div class="phone-top"></div><p class="muted"><b>${escapeHtml(state.selectedBank)}</b> app</p><h2>Identiteit bevestigen</h2><div class="notice">Naam: Sam de Vries<br>Geboortedatum: 14-05-1988<br>Adres: Voorbeeldstraat 12</div><button class="btn green" data-action="idin-done" style="width:100%;margin-top:18px">Bevestigen in app</button></div></div></div>`;
   }
   shell(html, { external: true, back: "back-to-overzicht" });
 }
